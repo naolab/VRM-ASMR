@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default function LicensePage() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   return (
     <div style={{
       minHeight: '100vh',
@@ -49,7 +50,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.`}
         </pre>
         <div style={{ marginTop: '30px' }}>
           <a
-            href="/"
+            href={`${basePath}/`}
             style={{
               color: '#0070f3',
               textDecoration: 'none',
