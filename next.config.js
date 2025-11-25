@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const basePath = process.env.NODE_ENV === 'production' ? '/vrm-asmr' : '';
+const basePath = process.env.NODE_ENV === 'production' ? '/VRM-ASMR' : '';
 
 const nextConfig = {
   reactStrictMode: true,
