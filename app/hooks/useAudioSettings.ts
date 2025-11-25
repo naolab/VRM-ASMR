@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useLocalStorageSettings } from './useLocalStorage'
 import { AudioFile } from '../types/audio'
 
@@ -24,6 +24,7 @@ const defaultAudioSettings: AudioSettings = {
 export const useAudioSettings = () => {
   const [settings, updateSettings] = useLocalStorageSettings(AUDIO_STORAGE_KEY, defaultAudioSettings)
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Clear audio files on mount (blob URLs become invalid after page reload)
   useEffect(() => {
@@ -49,30 +50,43 @@ export const useAudioSettings = () => {
   }, [updateSettings])
 
   const playAudio = useCallback((audioFile: AudioFile) => {
-    // Stop current audio if playing
-    if (currentPlayingAudio) {
+    // If clicking the same audio that's playing, stop it
+    if (currentPlayingAudio === audioFile.id) {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
+        audioRef.current = null
+      }
       setCurrentPlayingAudio(null)
+      return
     }
 
-    // If clicking the same audio that's playing, just stop it
-    if (currentPlayingAudio === audioFile.id) {
-      return
+    // Stop current audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current = null
     }
 
     // Start new audio
     setCurrentPlayingAudio(audioFile.id)
 
     const audio = new Audio(audioFile.url)
+    audioRef.current = audio
+
     audio.addEventListener('ended', () => {
       setCurrentPlayingAudio(null)
+      audioRef.current = null
     })
     audio.addEventListener('error', () => {
       setCurrentPlayingAudio(null)
+      audioRef.current = null
       alert('音声ファイルの再生に失敗しました')
     })
 
     audio.play().catch(() => {
       setCurrentPlayingAudio(null)
+      audioRef.current = null
       alert('音声ファイルの再生に失敗しました')
     })
   }, [currentPlayingAudio])
