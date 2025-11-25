@@ -10,6 +10,7 @@ import { setupVRMModel, hasExpressionManager } from '../utils/vrmSetup'
 import { loadVRMAnimation } from '../lib/VRMAnimation/loadVRMAnimation'
 import { AutoLookAt } from '../features/emoteController/autoLookAt'
 import { CameraFollower } from '../features/camera/CameraFollower'
+import { createMicrophone } from '../utils/createMicrophone'
 
 interface VRMViewerProps {
   modelPath?: string
@@ -119,6 +120,12 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         const ambientLight = new THREE.AmbientLight(0xffffff, VRM_CONFIG.LIGHTING.AMBIENT.INTENSITY)
         scene.add(ambientLight)
 
+        // Add Microphone
+        const microphone = createMicrophone()
+        // Position it in front of the camera
+        microphone.position.set(0, 1.15, 1.1)
+        scene.add(microphone)
+
         // Camera controls setup
         const cameraControls = new OrbitControls(camera, renderer.domElement)
         cameraControls.screenSpacePanning = true
@@ -135,7 +142,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
         // Load VRM with LookAtSmoother plugin
         const { VRMLookAtSmootherLoaderPlugin } = await import('../lib/VRMLookAtSmoother/VRMLookAtSmootherLoaderPlugin')
-        
+
         const loader = new GLTFLoader()
         loader.register((parser: any) => new VRMLoaderPlugin(parser, {
           lookAtPlugin: new VRMLookAtSmootherLoaderPlugin(parser),
@@ -245,10 +252,10 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
           // Update camera controls
           cameraControls.update()
-          
+
           // Notify parent about camera changes
           handleCameraUpdate(camera)
-          
+
           // Check if followCamera state changed
           const currentFollowCamera = followCameraRef.current
           const prevFollowCamera = prevFollowCameraRef.current
@@ -275,7 +282,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
           // Update previous state
           prevFollowCameraRef.current = currentFollowCamera
-          
+
           // Update VRM expressions (lip sync) before vrm.update for this frame
           if (vrm) {
             // Update lip sync using pre-determined mouth expression
@@ -286,7 +293,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
               // (fall back to target when not present)
               const prev = (vrm.expressionManager as any).__mouthPrev ?? 0
               const smoothed = prev + (target - prev) * LIP_SYNC_CONFIG.SMOOTHING_FACTOR
-              ;(vrm.expressionManager as any).__mouthPrev = smoothed
+                ; (vrm.expressionManager as any).__mouthPrev = smoothed
               vrm.expressionManager.setValue(mouthExpressionName, smoothed)
             }
           }
@@ -295,11 +302,11 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           if (vrm) {
             vrm.update(deltaTime)
           }
-          
+
           if (autoBlink) {
             autoBlink.update(deltaTime)
           }
-          
+
           renderer.render(scene, camera)
         }
         animate()
@@ -311,7 +318,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           renderer.setSize(window.innerWidth, window.innerHeight)
           cameraControls.update()
         }
-        
+
         window.addEventListener('resize', handleResize)
 
         // Final cleanup function
@@ -339,6 +346,19 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           // Clean up controls and renderer
           cameraControls.dispose()
           renderer.dispose()
+
+          // Clean up Microphone
+          scene.remove(microphone)
+          microphone.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.geometry.dispose()
+              if (Array.isArray(child.material)) {
+                child.material.forEach((m: THREE.Material) => m.dispose())
+              } else {
+                child.material.dispose()
+              }
+            }
+          })
 
           // Clear scene
           scene.clear()
@@ -391,7 +411,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           {error}
         </div>
       )}
-      
+
       {!isLoaded && !error && (
         <div style={{
           position: 'absolute',
