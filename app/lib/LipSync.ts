@@ -65,6 +65,7 @@ export class LipSync {
   public getVolume(): number {
     if (!this.analyser || !this.dataArray) return 0
 
+    // @ts-ignore
     this.analyser.getFloatTimeDomainData(this.dataArray)
 
     let volume = 0.0

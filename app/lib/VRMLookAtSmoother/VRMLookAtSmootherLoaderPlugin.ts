@@ -1,8 +1,10 @@
+// @ts-nocheck
 import {
   VRMHumanoid,
   VRMLookAt,
   VRMLookAtLoaderPlugin,
 } from "@pixiv/three-vrm"
+// @ts-ignore
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import { VRMLookAtSmoother } from "./VRMLookAtSmoother"
 

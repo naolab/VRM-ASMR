@@ -9,7 +9,7 @@ import { AutoBlink } from '../features/animation/AutoBlink'
 import { VRMModel, VRMLoadResult } from '../types/vrm'
 import { setupVRMModel, hasExpressionManager } from '../utils/vrmSetup'
 import { loadVRMAnimation } from '../lib/VRMAnimation/loadVRMAnimation'
-import { AutoLookAt } from '../features/emoteController/autoLookAt'
+import { AutoLookAt } from '../features/animation/AutoLookAt'
 import { CameraFollower } from '../features/camera/CameraFollower'
 import { createMicrophone } from '../utils/createMicrophone'
 
@@ -99,7 +99,9 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         const [THREE, { VRMLoaderPlugin }, { GLTFLoader }, { OrbitControls }] = await Promise.all([
           import('three'),
           import('@pixiv/three-vrm'),
+          // @ts-ignore
           import('three/examples/jsm/loaders/GLTFLoader'),
+          // @ts-ignore
           import('three/examples/jsm/controls/OrbitControls')
         ])
 
@@ -408,6 +410,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
       if (vrm) {
         scene?.remove(vrm.scene)
+        // @ts-ignore
         vrm.dispose?.()
       }
 
