@@ -17,6 +17,7 @@ interface VRMViewerProps {
   modelPath?: string
   followCamera?: boolean
   lipSyncVolume?: number
+  showMicrophone?: boolean
   onCameraUpdate?: (camera: THREE.PerspectiveCamera) => void
   onCharacterPositionUpdate?: (position: THREE.Vector3) => void
   onLoadingStateChange?: (loading: boolean) => void
@@ -26,6 +27,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
   modelPath = VRM_CONFIG.DEFAULT_MODEL_PATH,
   followCamera = false,
   lipSyncVolume = 0,
+  showMicrophone = true,
   onCameraUpdate,
   onCharacterPositionUpdate,
   onLoadingStateChange
@@ -37,6 +39,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
   const lipSyncVolumeRef = useRef(0)
   const followCameraRef = useRef(followCamera)
   const prevFollowCameraRef = useRef(followCamera)
+  const showMicrophoneRef = useRef(showMicrophone)
   const isLoadingRef = useRef(false)
   const animationFrameRef = useRef<number | null>(null)
 
@@ -48,6 +51,11 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
   useEffect(() => {
     followCameraRef.current = followCamera
   }, [followCamera])
+
+  // Update microphone visibility when prop changes
+  useEffect(() => {
+    showMicrophoneRef.current = showMicrophone
+  }, [showMicrophone])
 
   // Memoize camera update callback to prevent unnecessary re-renders
   const handleCameraUpdate = useCallback((camera: THREE.PerspectiveCamera) => {
@@ -160,6 +168,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Z
         )
         camera.add(microphone)
+        microphone.visible = showMicrophone
 
         // Camera controls setup
         cameraControls = new OrbitControls(camera, renderer.domElement)
@@ -320,6 +329,11 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
           updateControlsState(currentFollowCamera)
           prevFollowCameraRef.current = currentFollowCamera
+
+          // Update microphone visibility
+          if (microphone) {
+            microphone.visible = showMicrophoneRef.current
+          }
 
           // Lip sync update
           if (vrm && vrm.expressionManager && mouthExpressionName) {

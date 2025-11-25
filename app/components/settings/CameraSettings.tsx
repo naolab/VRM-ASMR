@@ -4,11 +4,15 @@ import { ToggleSwitch } from '../ui/ToggleSwitch'
 interface CameraSettingsProps {
   followCamera: boolean
   onFollowCameraChange: (value: boolean) => void
+  showMicrophone: boolean
+  onShowMicrophoneChange: (value: boolean) => void
 }
 
 export const CameraSettings: React.FC<CameraSettingsProps> = ({
   followCamera,
-  onFollowCameraChange
+  onFollowCameraChange,
+  showMicrophone,
+  onShowMicrophoneChange
 }) => {
   return (
     <div style={{ marginBottom: '40px' }}>
@@ -25,6 +29,12 @@ export const CameraSettings: React.FC<CameraSettingsProps> = ({
         checked={followCamera}
         onChange={onFollowCameraChange}
         label="カメラ追従"
+      />
+
+      <ToggleSwitch
+        checked={showMicrophone}
+        onChange={onShowMicrophoneChange}
+        label="マイク表示"
       />
     </div>
   )

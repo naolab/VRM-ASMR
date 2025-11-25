@@ -16,6 +16,8 @@ interface TabContentProps {
   onVRMFileChange: (file: File | null) => void
   followCamera: boolean
   onFollowCameraChange: (value: boolean) => void
+  showMicrophone: boolean
+  onShowMicrophoneChange: (value: boolean) => void
   // Audio settings
   spatialAudio: boolean
   volume: number
@@ -39,6 +41,8 @@ export const TabContent: React.FC<TabContentProps> = ({
   onVRMFileChange,
   followCamera,
   onFollowCameraChange,
+  showMicrophone,
+  onShowMicrophoneChange,
   // Audio props
   spatialAudio,
   volume,
@@ -76,6 +80,8 @@ export const TabContent: React.FC<TabContentProps> = ({
             <CameraSettings
               followCamera={followCamera}
               onFollowCameraChange={onFollowCameraChange}
+              showMicrophone={showMicrophone}
+              onShowMicrophoneChange={onShowMicrophoneChange}
             />
           </div>
         )

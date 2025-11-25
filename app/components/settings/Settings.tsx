@@ -19,6 +19,8 @@ interface SettingsProps {
   onClose: () => void
   onThemeChange: (theme: Theme) => void
   onFollowCameraChange: (value: boolean) => void
+  showMicrophone: boolean
+  onShowMicrophoneChange: (value: boolean) => void
   onSpatialAudioChange: (value: boolean) => void
   onVolumeChange: (value: number) => void
   onVRMFileChange: (file: File | null) => void
@@ -40,6 +42,8 @@ export const Settings: React.FC<SettingsProps> = ({
   onClose,
   onThemeChange,
   onFollowCameraChange,
+  showMicrophone,
+  onShowMicrophoneChange,
   onSpatialAudioChange,
   onVolumeChange,
   onVRMFileChange,
@@ -124,6 +128,8 @@ export const Settings: React.FC<SettingsProps> = ({
           onVRMFileChange={onVRMFileChange}
           followCamera={followCamera}
           onFollowCameraChange={onFollowCameraChange}
+          showMicrophone={showMicrophone}
+          onShowMicrophoneChange={onShowMicrophoneChange}
           // Audio settings
           spatialAudio={spatialAudio}
           volume={volume}

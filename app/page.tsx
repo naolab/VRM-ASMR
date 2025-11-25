@@ -39,7 +39,7 @@ export default function Home() {
     changeVRMFile,
     setVRMLoading
   } = useVRMSettings()
-  const { showSettings, openSettings, closeSettings } = useUISettings()
+  const { showSettings, openSettings, closeSettings, showMicrophone, changeShowMicrophone } = useUISettings()
   const [lipSyncVolume, setLipSyncVolume] = useState(0)
   const [camera, setCamera] = useState<THREE.PerspectiveCamera | null>(null)
   const [characterPosition, setCharacterPosition] = useState<THREE.Vector3 | null>(null)
@@ -103,6 +103,7 @@ export default function Home() {
               modelPath={customVRMUrl || undefined}
               followCamera={followCamera}
               lipSyncVolume={lipSyncVolume}
+              showMicrophone={showMicrophone}
               onCameraUpdate={handleCameraUpdate}
               onCharacterPositionUpdate={handleCharacterPositionUpdate}
               onLoadingStateChange={handleVRMLoadingStateChange}
@@ -147,6 +148,8 @@ export default function Home() {
         onClose={closeSettings}
         onThemeChange={changeTheme}
         onFollowCameraChange={changeFollowCamera}
+        showMicrophone={showMicrophone}
+        onShowMicrophoneChange={changeShowMicrophone}
         onSpatialAudioChange={changeSpatialAudio}
         onVolumeChange={changeVolume}
         onVRMFileChange={changeVRMFile}
