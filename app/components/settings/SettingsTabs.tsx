@@ -1,7 +1,7 @@
 import React from 'react'
-import { VRMIcon, AudioIcon, DisplayIcon } from '../ui/icons'
+import { VRMIcon, AudioIcon, DisplayIcon, SettingsIcon } from '../ui/icons'
 
-export type SettingsTab = 'vrm' | 'audio' | 'display'
+export type SettingsTab = 'vrm' | 'audio' | 'display' | 'about'
 
 interface SettingsTabInfo {
   id: SettingsTab
@@ -12,7 +12,8 @@ interface SettingsTabInfo {
 const TAB_CONFIG: SettingsTabInfo[] = [
   { id: 'vrm', label: 'VRM設定', icon: VRMIcon },
   { id: 'audio', label: '音声設定', icon: AudioIcon },
-  { id: 'display', label: '表示設定', icon: DisplayIcon }
+  { id: 'display', label: '表示設定', icon: DisplayIcon },
+  { id: 'about', label: '情報', icon: SettingsIcon }
 ]
 
 interface SettingsTabsProps {

@@ -86,7 +86,7 @@ export const Settings: React.FC<SettingsProps> = ({
             marginBottom: '0',
             overflowX: 'auto'
           }}>
-            {(['vrm', 'audio', 'display'] as SettingsTab[]).map((tab) => (
+            {(['vrm', 'audio', 'display', 'about'] as SettingsTab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -105,7 +105,7 @@ export const Settings: React.FC<SettingsProps> = ({
                   whiteSpace: 'nowrap'
                 }}
               >
-                {tab === 'vrm' ? 'VRM' : tab === 'audio' ? '音声' : '表示'}
+                {tab === 'vrm' ? 'VRM' : tab === 'audio' ? '音声' : tab === 'display' ? '表示' : '情報'}
               </button>
             ))}
           </div>

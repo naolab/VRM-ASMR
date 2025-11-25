@@ -7,6 +7,7 @@ import { AudioSettings } from './AudioSettings'
 import { AudioFileSettings } from './AudioFileSettings'
 import { ThemeSettings } from './ThemeSettings'
 import { SettingsTab } from './SettingsTabs'
+import { AboutSettings } from './AboutSettings'
 
 interface TabContentProps {
   activeTab: SettingsTab
@@ -135,6 +136,10 @@ export const TabContent: React.FC<TabContentProps> = ({
           </div>
         )
 
+      case 'about':
+        return (
+          <AboutSettings />
+        )
       default:
         return null
     }
