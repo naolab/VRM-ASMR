@@ -1,14 +1,11 @@
-import { useCallback } from 'react'
-import { useLocalStorage } from './useLocalStorage'
+import { useCallback, useState } from 'react'
 import { Theme, ThemeOption } from '../types/settings'
-
-const THEME_STORAGE_KEY = 'vrm-asmr-theme'
 
 /**
  * テーマ関連の設定を管理するフック
  */
 export const useThemeSettings = () => {
-  const [currentTheme, setCurrentTheme] = useLocalStorage<Theme>(THEME_STORAGE_KEY, 'blue')
+  const [currentTheme, setCurrentTheme] = useState<Theme>('blue')
 
   const themes: ThemeOption[] = [
     { value: 'blue', color: '#3B82F6' },

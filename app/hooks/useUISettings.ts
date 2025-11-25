@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 
 /**
  * UI表示状態を管理するフック
@@ -7,14 +7,6 @@ import { useState, useCallback, useEffect } from 'react'
 export const useUISettings = () => {
   const [showSettings, setShowSettings] = useState(false)
   const [showMicrophone, setShowMicrophone] = useState(true)
-
-  // Load showMicrophone from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('showMicrophone')
-    if (saved !== null) {
-      setShowMicrophone(saved === 'true')
-    }
-  }, [])
 
   const openSettings = useCallback(() => {
     setShowSettings(true)
@@ -30,7 +22,6 @@ export const useUISettings = () => {
 
   const changeShowMicrophone = useCallback((value: boolean) => {
     setShowMicrophone(value)
-    localStorage.setItem('showMicrophone', String(value))
   }, [])
 
   return {

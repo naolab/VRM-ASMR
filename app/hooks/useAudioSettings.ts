@@ -1,8 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { useLocalStorageSettings } from './useLocalStorage'
+import { useState, useCallback, useRef } from 'react'
 import { AudioFile } from '../types/audio'
-
-const AUDIO_STORAGE_KEY = 'vrm-asmr-audio'
 
 interface AudioSettings {
   spatialAudio: boolean
@@ -22,32 +19,25 @@ const defaultAudioSettings: AudioSettings = {
  * 音声関連の設定を管理するフック
  */
 export const useAudioSettings = () => {
-  const [settings, updateSettings] = useLocalStorageSettings(AUDIO_STORAGE_KEY, defaultAudioSettings)
+  const [settings, setSettings] = useState<AudioSettings>(defaultAudioSettings)
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Clear audio files on mount (blob URLs become invalid after page reload)
-  useEffect(() => {
-    if (settings.audioFiles.length > 0) {
-      updateSettings({ audioFiles: [], selectedAudioId: null })
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   const changeSpatialAudio = useCallback((spatialAudio: boolean) => {
-    updateSettings({ spatialAudio })
-  }, [updateSettings])
+    setSettings(prev => ({ ...prev, spatialAudio }))
+  }, [])
 
   const changeVolume = useCallback((volume: number) => {
-    updateSettings({ volume })
-  }, [updateSettings])
+    setSettings(prev => ({ ...prev, volume }))
+  }, [])
 
   const changeAudioFiles = useCallback((audioFiles: AudioFile[]) => {
-    updateSettings({ audioFiles })
-  }, [updateSettings])
+    setSettings(prev => ({ ...prev, audioFiles }))
+  }, [])
 
   const changeSelectedAudio = useCallback((selectedAudioId: string | null) => {
-    updateSettings({ selectedAudioId })
-  }, [updateSettings])
+    setSettings(prev => ({ ...prev, selectedAudioId }))
+  }, [])
 
   const playAudio = useCallback((audioFile: AudioFile) => {
     // If clicking the same audio that's playing, stop it
