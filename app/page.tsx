@@ -121,14 +121,14 @@ export default function Home() {
         }>
           <AudioPlayer
             onVolumeChange={handleVolumeChange}
-            camera={camera}
-          characterPosition={characterPosition}
-          spatialAudio={spatialAudio}
-          masterVolume={volume}
-          audioFiles={audioFiles}
-          selectedAudioId={selectedAudioId}
-          onAudioSelect={changeSelectedAudio}
-        />
+            camera={camera || undefined}
+            characterPosition={characterPosition || undefined}
+            spatialAudio={spatialAudio}
+            masterVolume={volume}
+            audioFiles={audioFiles}
+            selectedAudioId={selectedAudioId}
+            onAudioSelect={changeSelectedAudio}
+          />
         </Suspense>
         <Menu onOpenSettings={openSettings} />
       </main>
@@ -137,22 +137,22 @@ export default function Home() {
         isOpen={showSettings}
         themes={themes}
         currentTheme={currentTheme}
-          followCamera={followCamera}
-          spatialAudio={spatialAudio}
-          volume={volume}
-          vrmFileName={vrmFileName || undefined}
-          isVRMLoading={isVRMLoading}
-          audioFiles={audioFiles}
-          currentPlayingAudio={currentPlayingAudio}
-          onClose={closeSettings}
-          onThemeChange={changeTheme}
-          onFollowCameraChange={changeFollowCamera}
-          onSpatialAudioChange={changeSpatialAudio}
-          onVolumeChange={changeVolume}
-          onVRMFileChange={changeVRMFile}
-          onAudioFilesChange={changeAudioFiles}
-          onPlayAudio={playAudio}
-        />
+        followCamera={followCamera}
+        spatialAudio={spatialAudio}
+        volume={volume}
+        vrmFileName={vrmFileName || undefined}
+        isVRMLoading={isVRMLoading}
+        audioFiles={audioFiles}
+        currentPlayingAudio={currentPlayingAudio}
+        onClose={closeSettings}
+        onThemeChange={changeTheme}
+        onFollowCameraChange={changeFollowCamera}
+        onSpatialAudioChange={changeSpatialAudio}
+        onVolumeChange={changeVolume}
+        onVRMFileChange={changeVRMFile}
+        onAudioFilesChange={changeAudioFiles}
+        onPlayAudio={playAudio}
+      />
     </>
   )
 }

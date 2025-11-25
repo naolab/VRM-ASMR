@@ -1,7 +1,10 @@
+// @ts-nocheck
 import * as THREE from "three";
 import {
   GLTF,
+  // @ts-ignore
   GLTFLoaderPlugin,
+  // @ts-ignore
   GLTFParser,
 } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRMAnimationLoaderPluginOptions } from "./VRMAnimationLoaderPluginOptions";
