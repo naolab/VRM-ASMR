@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense, lazy, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import * as THREE from 'three'
 import { useThemeSettings } from './hooks/useThemeSettings'
 import { useAudioSettings } from './hooks/useAudioSettings'
@@ -9,11 +9,8 @@ import { useUISettings } from './hooks/useUISettings'
 import { Menu } from './components/Menu'
 import { Settings } from './components/settings'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { LoadingSpinner } from './components/ui/LoadingSpinner'
-
-// 重いコンポーネントを動的インポート
-const VRMViewer = lazy(() => import('./components/VRMViewer').then(module => ({ default: module.VRMViewer })))
-const AudioPlayer = lazy(() => import('./components/AudioPlayer').then(module => ({ default: module.AudioPlayer })))
+import { VRMViewer } from './components/VRMViewer'
+import { AudioPlayer } from './components/AudioPlayer'
 
 export default function Home() {
   // 細分化されたフックを使用
@@ -89,48 +86,26 @@ export default function Home() {
             </div>
           }
         >
-          <Suspense fallback={
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)'
-            }}>
-              <LoadingSpinner message="VRMキャラクターを読み込み中..." />
-            </div>
-          }>
-            <VRMViewer
-              modelPath={customVRMUrl || undefined}
-              followCamera={followCamera}
-              lipSyncVolume={lipSyncVolume}
-              showMicrophone={showMicrophone}
-              onCameraUpdate={handleCameraUpdate}
-              onCharacterPositionUpdate={handleCharacterPositionUpdate}
-              onLoadingStateChange={handleVRMLoadingStateChange}
-            />
-          </Suspense>
-        </ErrorBoundary>
-        <Suspense fallback={
-          <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)'
-          }}>
-            <LoadingSpinner size="sm" message="音声プレイヤーを読み込み中..." />
-          </div>
-        }>
-          <AudioPlayer
-            onVolumeChange={handleVolumeChange}
-            camera={camera || undefined}
-            characterPosition={characterPosition || undefined}
-            spatialAudio={spatialAudio}
-            masterVolume={volume}
-            audioFiles={audioFiles}
-            selectedAudioId={selectedAudioId}
-            onAudioSelect={changeSelectedAudio}
+          <VRMViewer
+            modelPath={customVRMUrl || undefined}
+            followCamera={followCamera}
+            lipSyncVolume={lipSyncVolume}
+            showMicrophone={showMicrophone}
+            onCameraUpdate={handleCameraUpdate}
+            onCharacterPositionUpdate={handleCharacterPositionUpdate}
+            onLoadingStateChange={handleVRMLoadingStateChange}
           />
-        </Suspense>
+        </ErrorBoundary>
+        <AudioPlayer
+          onVolumeChange={handleVolumeChange}
+          camera={camera || undefined}
+          characterPosition={characterPosition || undefined}
+          spatialAudio={spatialAudio}
+          masterVolume={volume}
+          audioFiles={audioFiles}
+          selectedAudioId={selectedAudioId}
+          onAudioSelect={changeSelectedAudio}
+        />
         <Menu onOpenSettings={openSettings} />
       </main>
 
