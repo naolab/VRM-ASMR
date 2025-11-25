@@ -137,6 +137,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         cameraControls.screenSpacePanning = true
         cameraControls.target.set(0, VRM_CONFIG.CAMERA.POSITION.Y, 0)
         cameraControls.update()
+        cameraControls.minDistance = 0.5
 
         // Function to update controls based on followCamera state
         const updateControlsState = (isFollowing: boolean) => {
