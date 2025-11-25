@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useLocalStorageSettings } from './useLocalStorage'
 
 const VRM_STORAGE_KEY = 'vrm-asmr-vrm'
@@ -19,6 +19,13 @@ export const useVRMSettings = () => {
   const [settings, updateSettings] = useLocalStorageSettings(VRM_STORAGE_KEY, defaultVRMSettings)
   const [vrmFileName, setVrmFileName] = useState<string | null>(null)
   const [isVRMLoading, setIsVRMLoading] = useState(false)
+
+  // Clear custom VRM URL on mount (blob URLs become invalid after page reload)
+  useEffect(() => {
+    if (settings.customVRMUrl) {
+      updateSettings({ customVRMUrl: undefined })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const changeFollowCamera = useCallback((followCamera: boolean) => {
     updateSettings({ followCamera })
