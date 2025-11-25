@@ -120,11 +120,17 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         const ambientLight = new THREE.AmbientLight(0xffffff, VRM_CONFIG.LIGHTING.AMBIENT.INTENSITY)
         scene.add(ambientLight)
 
+        // Add camera to scene so that child objects (microphone) are rendered
+        scene.add(camera)
+
         // Add Microphone
         const microphone = createMicrophone()
-        // Position it in front of the camera
-        microphone.position.set(0, 1.15, 1.1)
-        scene.add(microphone)
+        // Position it in front of the camera (Camera local coordinates)
+        // Z is negative forward in camera space
+        // Adjust Y to be at the bottom of the screen
+        microphone.position.set(0, -0.125, -0.4)
+        // Adjust rotation if needed (it's upright by default)
+        camera.add(microphone)
 
         // Camera controls setup
         const cameraControls = new OrbitControls(camera, renderer.domElement)
@@ -348,7 +354,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           renderer.dispose()
 
           // Clean up Microphone
-          scene.remove(microphone)
+          camera.remove(microphone)
           microphone.traverse((child) => {
             if (child instanceof THREE.Mesh) {
               child.geometry.dispose()
