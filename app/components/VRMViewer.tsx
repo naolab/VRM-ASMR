@@ -62,7 +62,28 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
     setIsMounted(true)
     if (typeof window === 'undefined') return
 
-    let cleanup: (() => void) | null = null
+    let mounted = true
+    let scene: THREE.Scene | null = null
+    let camera: THREE.PerspectiveCamera | null = null
+    let renderer: THREE.WebGLRenderer | null = null
+    let cameraControls: any | null = null // OrbitControls type is dynamic
+    let vrm: VRMModel | null = null
+    let mixer: THREE.AnimationMixer | null = null
+    let microphone: THREE.Group | null = null
+    let animationFrameId: number | null = null
+    let autoBlink: AutoBlink | null = null
+    let autoLookAt: AutoLookAt | null = null
+    let cameraFollower: CameraFollower | null = null
+    let mouthExpressionName: string | null = null
+    let clock: THREE.Clock | null = null
+
+    const handleResize = () => {
+      if (!camera || !renderer) return
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      if (cameraControls) cameraControls.update()
+    }
 
     const initVRM = async () => {
       if (!canvasRef.current || isLoadingRef.current) {
@@ -82,11 +103,13 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           import('three/examples/jsm/controls/OrbitControls')
         ])
 
+        if (!mounted) return
+
         // Three.js setup
-        const scene = new THREE.Scene()
+        scene = new THREE.Scene()
 
         // Camera setup
-        const camera = new THREE.PerspectiveCamera(
+        camera = new THREE.PerspectiveCamera(
           VRM_CONFIG.CAMERA.FOV,
           window.innerWidth / window.innerHeight,
           VRM_CONFIG.CAMERA.NEAR,
@@ -99,22 +122,17 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         )
 
         // Renderer setup with performance optimizations
-        const renderer = new THREE.WebGLRenderer({
+        renderer = new THREE.WebGLRenderer({
           canvas: canvasRef.current,
           alpha: true,
-          antialias: window.devicePixelRatio <= 1, // Only enable AA on low-DPI displays
-          powerPreference: 'high-performance' // Prefer dedicated GPU
+          antialias: window.devicePixelRatio <= 1,
+          powerPreference: 'high-performance'
         })
         renderer.setSize(window.innerWidth, window.innerHeight)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // Cap pixel ratio for performance
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         renderer.shadowMap.enabled = true
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
-
-        // Enable frustum culling and automatic clearing
         renderer.autoClear = true
-        renderer.autoClearColor = true
-        renderer.autoClearDepth = true
-        renderer.autoClearStencil = true
 
         // Lights
         const directionalLight = new THREE.DirectionalLight(0xffffff, VRM_CONFIG.LIGHTING.DIRECTIONAL.INTENSITY)
@@ -129,32 +147,29 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         const ambientLight = new THREE.AmbientLight(0xffffff, VRM_CONFIG.LIGHTING.AMBIENT.INTENSITY)
         scene.add(ambientLight)
 
-        // Add camera to scene so that child objects (microphone) are rendered
+        // Add camera to scene
         scene.add(camera)
 
         // Add Microphone
-        const microphone = createMicrophone()
-        // Position it in front of the camera (Camera local coordinates)
-        // Z is negative forward in camera space
-        // Adjust Y to be at the bottom of the screen
+        microphone = createMicrophone()
         microphone.position.set(
           AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.X,
           AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Y,
           AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Z
         )
-        // Adjust rotation if needed (it's upright by default)
         camera.add(microphone)
 
         // Camera controls setup
-        const cameraControls = new OrbitControls(camera, renderer.domElement)
+        cameraControls = new OrbitControls(camera, renderer.domElement)
         cameraControls.screenSpacePanning = true
         cameraControls.target.set(0, VRM_CONFIG.CAMERA.POSITION.Y, 0)
         cameraControls.update()
         cameraControls.minDistance = 0.5
 
-        // Function to update controls based on followCamera state
         const updateControlsState = (isFollowing: boolean) => {
-          cameraControls.enableRotate = !isFollowing
+          if (cameraControls) {
+            cameraControls.enableRotate = !isFollowing
+          }
         }
 
         // Notify parent about initial camera state
@@ -163,18 +178,14 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         // Load VRM with LookAtSmoother plugin
         const { VRMLookAtSmootherLoaderPlugin } = await import('../lib/VRMLookAtSmoother/VRMLookAtSmootherLoaderPlugin')
 
+        if (!mounted) return
+
         const loader = new GLTFLoader()
         loader.register((parser: any) => new VRMLoaderPlugin(parser, {
           lookAtPlugin: new VRMLookAtSmootherLoaderPlugin(parser),
         }))
 
-        let vrm: VRMModel | null = null
-        let autoBlink: AutoBlink | null = null
-        let autoLookAt: AutoLookAt | null = null
-        let mixer: THREE.AnimationMixer | null = null
-        let cameraFollower: CameraFollower | null = null
-        let mouthExpressionName: string | null = null
-        const clock = new THREE.Clock()
+        clock = new THREE.Clock()
 
         // Start loading
         onLoadingStateChange?.(true)
@@ -182,7 +193,10 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         loader.load(
           modelPath,
           async (gltf: VRMLoadResult) => {
+            if (!mounted) return
+
             vrm = gltf.userData.vrm
+            if (!vrm) return
 
             // Setup VRM model
             setupVRMModel(vrm)
@@ -191,11 +205,9 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             if (hasExpressionManager(vrm)) {
               autoBlink = new AutoBlink(vrm.expressionManager)
 
-              // Find available mouth expression reliably
               const em = vrm.expressionManager
               const tryNames: string[] = [
                 ...VRM_CONFIG.MOUTH_EXPRESSION_CANDIDATES,
-                // Include manager-suggested names if available (aa, ee, ih, oh, ou)
                 ...((em as any).mouthExpressionNames ?? [])
               ]
               for (const name of tryNames) {
@@ -205,23 +217,22 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
                 }
               }
 
-              // Fallback to 'aa' if nothing matched (some models still accept it)
               if (!mouthExpressionName && typeof em.getExpression === 'function' && em.getExpression('aa')) {
                 mouthExpressionName = 'aa'
               }
             }
 
             // Initialize auto look-at system
-            autoLookAt = new AutoLookAt(vrm, camera)
+            autoLookAt = new AutoLookAt(vrm, camera!)
 
             // Initialize camera follower
-            cameraFollower = new CameraFollower(vrm, camera)
+            cameraFollower = new CameraFollower(vrm, camera!)
             cameraFollower.setEnabled(followCameraRef.current)
 
             // Initialize animation mixer
             mixer = new THREE.AnimationMixer(vrm.scene)
 
-            scene.add(vrm.scene)
+            scene!.add(vrm.scene)
 
             // Notify parent about character position
             handleCharacterPositionUpdate(vrm.scene.position)
@@ -229,60 +240,67 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             // Load idle animation
             try {
               const idleAnimation = await loadVRMAnimation('/idle_loop.vrma')
-              if (idleAnimation) {
+              if (idleAnimation && mounted) {
                 const clip = idleAnimation.createAnimationClip(vrm)
-                const action = mixer.clipAction(clip)
+                const action = mixer!.clipAction(clip)
                 action.setLoop(THREE.LoopRepeat, Infinity)
                 action.play()
               }
             } catch (error) {
-              // Idle animation is optional, continue without it
+              // Idle animation is optional
             }
+
+            if (!mounted) return
+
             setIsLoaded(true)
             isLoadingRef.current = false
             onLoadingStateChange?.(false)
           },
           undefined,
           (error: unknown) => {
+            if (!mounted) return
+            console.error('VRM load error:', error)
             setError('VRMファイルの読み込みに失敗しました')
             isLoadingRef.current = false
             onLoadingStateChange?.(false)
           }
         )
 
-        // Animation loop with frame rate optimization
+        // Animation loop
         let lastFrameTime = 0
         const targetFPS = 60
         const frameInterval = 1000 / targetFPS
 
         const animate = (currentTime = 0) => {
-          animationFrameRef.current = requestAnimationFrame(animate)
+          if (!mounted) return
 
-          // Frame rate limiting for better performance
+          animationFrameId = requestAnimationFrame(animate)
+
           if (currentTime - lastFrameTime < frameInterval) {
             return
           }
           lastFrameTime = currentTime
 
-          const deltaTime = clock.getDelta()
+          const deltaTime = clock!.getDelta()
 
-          // Update animation mixer first (affects poses/expressions from clips)
           if (mixer) {
             mixer.update(deltaTime)
           }
 
-          // Update camera controls
-          cameraControls.update()
+          if (cameraControls) {
+            cameraControls.update()
+          }
 
-          // Notify parent about camera changes
-          handleCameraUpdate(camera)
+          if (camera) {
+            handleCameraUpdate(camera)
+          }
 
-          // Check if followCamera state changed
+          // Camera reset logic
           const currentFollowCamera = followCameraRef.current
           const prevFollowCamera = prevFollowCameraRef.current
 
-          // If followCamera was turned ON, reset camera to initial position
-          if (!prevFollowCamera && currentFollowCamera) {
+          if (!prevFollowCamera && currentFollowCamera && camera && cameraControls) {
+
             camera.position.set(
               VRM_CONFIG.CAMERA.POSITION.X,
               VRM_CONFIG.CAMERA.POSITION.Y,
@@ -290,36 +308,26 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             )
             cameraControls.target.set(0, VRM_CONFIG.CAMERA.POSITION.Y, 0)
             cameraControls.update()
+
           }
 
-          // Update camera follower
           if (cameraFollower) {
             cameraFollower.setEnabled(currentFollowCamera)
             cameraFollower.update()
           }
 
-          // Update OrbitControls rotation based on followCamera state
           updateControlsState(currentFollowCamera)
-
-          // Update previous state
           prevFollowCameraRef.current = currentFollowCamera
 
-          // Update VRM expressions (lip sync) before vrm.update for this frame
-          if (vrm) {
-            // Update lip sync using pre-determined mouth expression
-            if (vrm.expressionManager && mouthExpressionName) {
-              // Map input volume [0,1] with volume multiplier (ChatVRM方式)
-              const target = Math.max(0, Math.min(1, lipSyncVolumeRef.current * LIP_SYNC_CONFIG.VOLUME_MULTIPLIER))
-              // Keep lightweight smoothing via previous value stored on manager
-              // (fall back to target when not present)
-              const prev = (vrm.expressionManager as any).__mouthPrev ?? 0
-              const smoothed = prev + (target - prev) * LIP_SYNC_CONFIG.SMOOTHING_FACTOR
-                ; (vrm.expressionManager as any).__mouthPrev = smoothed
-              vrm.expressionManager.setValue(mouthExpressionName, smoothed)
-            }
+          // Lip sync update
+          if (vrm && vrm.expressionManager && mouthExpressionName) {
+            const target = Math.max(0, Math.min(1, lipSyncVolumeRef.current * LIP_SYNC_CONFIG.VOLUME_MULTIPLIER))
+            const prev = (vrm.expressionManager as any).__mouthPrev ?? 0
+            const smoothed = prev + (target - prev) * LIP_SYNC_CONFIG.SMOOTHING_FACTOR
+              ; (vrm.expressionManager as any).__mouthPrev = smoothed
+            vrm.expressionManager.setValue(mouthExpressionName, smoothed)
           }
 
-          // Update VRM (applies expression weights and animations)
           if (vrm) {
             vrm.update(deltaTime)
           }
@@ -328,7 +336,7 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             autoBlink.update(deltaTime)
           }
 
-          // Apply manual tilt towards microphone (Head and Neck) temporarily for rendering
+          // Manual tilt for mic
           const head = vrm?.humanoid?.getNormalizedBoneNode('head')
           const neck = vrm?.humanoid?.getNormalizedBoneNode('neck')
           const leftEye = vrm?.humanoid?.getNormalizedBoneNode('leftEye')
@@ -339,95 +347,89 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
           const originalLeftEyeRot = leftEye?.rotation.clone()
           const originalRightEyeRot = rightEye?.rotation.clone()
 
-          // Tilt head/neck down towards mic
           const tiltAmount = 0.15
           const neckTiltAmount = 0.05
 
           if (head) head.rotation.x += tiltAmount
           if (neck) neck.rotation.x += neckTiltAmount
 
-          // Compensate eyes to look back up at camera
-          // (Subtract the total tilt amount from eyes)
           const totalTilt = tiltAmount + neckTiltAmount
           if (leftEye) leftEye.rotation.x -= totalTilt
           if (rightEye) rightEye.rotation.x -= totalTilt
 
-          renderer.render(scene, camera)
+          if (renderer && scene && camera) {
+            renderer.render(scene, camera)
+          }
 
-          // Restore original rotations to prevent accumulation
           if (head && originalHeadRot) head.rotation.copy(originalHeadRot)
           if (neck && originalNeckRot) neck.rotation.copy(originalNeckRot)
           if (leftEye && originalLeftEyeRot) leftEye.rotation.copy(originalLeftEyeRot)
           if (rightEye && originalRightEyeRot) rightEye.rotation.copy(originalRightEyeRot)
         }
-        animate()
 
-        // Handle resize
-        const handleResize = () => {
-          camera.aspect = window.innerWidth / window.innerHeight
-          camera.updateProjectionMatrix()
-          renderer.setSize(window.innerWidth, window.innerHeight)
-          cameraControls.update()
-        }
+        animate()
 
         window.addEventListener('resize', handleResize)
 
-        // Final cleanup function
-        cleanup = () => {
-          window.removeEventListener('resize', handleResize)
-
-          // Stop animation loop
-          if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current)
-            animationFrameRef.current = null
-          }
-
-          // Clean up VRM
-          if (vrm) {
-            scene.remove(vrm.scene)
-            vrm.dispose?.()
-          }
-
-          // Clean up mixer
-          if (mixer) {
-            mixer.stopAllAction()
-            mixer.uncacheRoot(mixer.getRoot())
-          }
-
-          // Clean up controls and renderer
-          cameraControls.dispose()
-          renderer.dispose()
-
-          // Clean up Microphone
-          camera.remove(microphone)
-          microphone.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-              child.geometry.dispose()
-              if (Array.isArray(child.material)) {
-                child.material.forEach((m: THREE.Material) => m.dispose())
-              } else {
-                child.material.dispose()
-              }
-            }
-          })
-
-          // Clear scene
-          scene.clear()
-        }
-
       } catch (err) {
-        setError('VRMの初期化に失敗しました')
-        isLoadingRef.current = false
-        onLoadingStateChange?.(false)
+        if (mounted) {
+          console.error('VRM init error:', err)
+          setError('VRMの初期化に失敗しました')
+          isLoadingRef.current = false
+          onLoadingStateChange?.(false)
+        }
       }
     }
 
     initVRM()
 
     return () => {
-      if (cleanup) cleanup()
+      mounted = false
+      isLoadingRef.current = false // Reset loading flag
+
+      window.removeEventListener('resize', handleResize)
+
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+
+      if (mixer) {
+        mixer.stopAllAction()
+        mixer.uncacheRoot(mixer.getRoot())
+      }
+
+      if (cameraControls) {
+        cameraControls.dispose()
+      }
+
+      if (renderer) {
+        renderer.dispose()
+      }
+
+      if (vrm) {
+        scene?.remove(vrm.scene)
+        vrm.dispose?.()
+      }
+
+      if (microphone && camera) {
+        camera.remove(microphone)
+        microphone.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose()
+            if (Array.isArray(child.material)) {
+              child.material.forEach((m: THREE.Material) => m.dispose())
+            } else if (child.material) {
+              child.material.dispose()
+            }
+          }
+        })
+      }
+
+      if (scene) {
+        scene.clear()
+      }
     }
-  }, [modelPath]) // modelPathが変更された時のみ再初期化
+  }, [modelPath, handleCameraUpdate, handleCharacterPositionUpdate, onLoadingStateChange])
 
   if (!isMounted) {
     return (
