@@ -42,22 +42,6 @@ export const AudioSelector: React.FC<AudioSelectorProps> = ({
     return name.substring(0, maxLength - 3) + '...'
   }
 
-  if (!hasAudioFiles) {
-    return (
-      <div style={{
-        padding: '8px 12px',
-        backgroundColor: 'rgba(64, 64, 64, 0.7)',
-        border: '1px solid rgba(128, 128, 128, 0.4)',
-        borderRadius: '8px',
-        color: 'rgba(255, 255, 255, 0.7)',
-        fontSize: '14px',
-        cursor: 'not-allowed'
-      }}>
-        音声なし
-      </div>
-    )
-  }
-
   return (
     <div
       ref={dropdownRef}
@@ -81,7 +65,7 @@ export const AudioSelector: React.FC<AudioSelectorProps> = ({
           opacity: disabled ? 0.6 : 1,
           display: 'flex',
           alignItems: 'center',
-          minWidth: '140px',
+          minWidth: '180px', // Increased width
           position: 'relative',
           transition: 'all 0.2s ease'
         }}
@@ -93,7 +77,7 @@ export const AudioSelector: React.FC<AudioSelectorProps> = ({
           flex: 1,
           textAlign: 'left'
         }}>
-          {selectedAudio ? truncateFileName(selectedAudio.name) : 'デフォルト音声'}
+          {selectedAudio ? truncateFileName(selectedAudio.name) : 'サンプル音声 (test.mp3)'}
         </span>
         <span style={{
           position: 'absolute',
@@ -132,7 +116,7 @@ export const AudioSelector: React.FC<AudioSelectorProps> = ({
               fontSize: '14px',
               cursor: 'pointer',
               backgroundColor: !selectedAudioId ? 'rgba(0, 122, 255, 0.3)' : 'transparent',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+              borderBottom: hasAudioFiles ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
             }}
             onMouseEnter={(e) => {
               if (!selectedAudioId) return
@@ -143,7 +127,7 @@ export const AudioSelector: React.FC<AudioSelectorProps> = ({
               e.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
-            デフォルト音声
+            サンプル音声 (test.mp3)
           </div>
 
           {/* Audio file options */}

@@ -123,10 +123,17 @@ export const AudioFileSettings: React.FC<AudioFileSettingsProps> = ({
         fontSize: '22px',
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: '20px'
+        marginBottom: '8px'
       }}>
         音声ファイル ({audioFiles.length}/{maxFiles})
       </h3>
+      <div style={{
+        fontSize: '14px',
+        color: '#666',
+        marginBottom: '20px'
+      }}>
+        デフォルト: サンプル音声 (test.mp3)
+      </div>
 
       {/* File upload area */}
       <div
