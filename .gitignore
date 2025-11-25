@@ -1,5 +1,6 @@
 # AI設定ファイル（ルートのみ除外）
-/*.md
+*.md
+!README.md
 
 # docsフォルダも除外
 docs/
