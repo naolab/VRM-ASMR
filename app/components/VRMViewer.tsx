@@ -65,14 +65,22 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
     let cleanup: (() => void) | null = null
 
     const initVRM = async () => {
-      if (!canvasRef.current || isLoadingRef.current) return
-      isLoadingRef.current = true
+      if (!canvasRef.current || isLoadingRef.current) {
+        return
+      }
 
       try {
-        const THREE = await import('three')
-        const { VRMLoaderPlugin } = await import('@pixiv/three-vrm')
-        const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader')
-        const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls')
+        isLoadingRef.current = true
+        setIsLoaded(false)
+        setError(null)
+
+        // Dynamic imports
+        const [THREE, { VRMLoaderPlugin }, { GLTFLoader }, { OrbitControls }] = await Promise.all([
+          import('three'),
+          import('@pixiv/three-vrm'),
+          import('three/examples/jsm/loaders/GLTFLoader'),
+          import('three/examples/jsm/controls/OrbitControls')
+        ])
 
         // Three.js setup
         const scene = new THREE.Scene()
@@ -230,13 +238,14 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             } catch (error) {
               // Idle animation is optional, continue without it
             }
-
             setIsLoaded(true)
+            isLoadingRef.current = false
             onLoadingStateChange?.(false)
           },
           undefined,
           (error: unknown) => {
             setError('VRMファイルの読み込みに失敗しました')
+            isLoadingRef.current = false
             onLoadingStateChange?.(false)
           }
         )
@@ -404,14 +413,12 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
           // Clear scene
           scene.clear()
-
-          // Reset loading flag
-          isLoadingRef.current = false
         }
 
       } catch (err) {
         setError('VRMの初期化に失敗しました')
         isLoadingRef.current = false
+        onLoadingStateChange?.(false)
       }
     }
 
