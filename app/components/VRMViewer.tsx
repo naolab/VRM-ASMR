@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { VRM_CONFIG } from '../constants/vrm'
 import { LIP_SYNC_CONFIG } from '../constants/lipSync'
+import { AUDIO_CONFIG } from '../constants/audio'
 import { AutoBlink } from '../features/animation/AutoBlink'
 import { VRMModel, VRMLoadResult } from '../types/vrm'
 import { setupVRMModel, hasExpressionManager } from '../utils/vrmSetup'
@@ -128,7 +129,11 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         // Position it in front of the camera (Camera local coordinates)
         // Z is negative forward in camera space
         // Adjust Y to be at the bottom of the screen
-        microphone.position.set(0, -0.125, -0.4)
+        microphone.position.set(
+          AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.X,
+          AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Y,
+          AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Z
+        )
         // Adjust rotation if needed (it's upright by default)
         camera.add(microphone)
 

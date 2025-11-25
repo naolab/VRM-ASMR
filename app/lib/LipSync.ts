@@ -14,7 +14,7 @@ export class LipSync {
   public async startAnalysis(audioUrl: string): Promise<AudioBufferSourceNode | null> {
     try {
       this.audioContext = new AudioContext()
-      
+
       const response = await fetch(audioUrl)
       const arrayBuffer = await response.arrayBuffer()
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
@@ -26,7 +26,7 @@ export class LipSync {
       // Create gain node for volume control
       this.gainNode = this.audioContext.createGain()
       this.gainNode.gain.value = this.masterVolume
-      
+
       // Create panner node for 3D spatial audio
       this.pannerNode = this.audioContext.createPanner()
       this.pannerNode.panningModel = AUDIO_CONFIG.SPATIAL.PANNING_MODEL
@@ -37,22 +37,22 @@ export class LipSync {
       this.pannerNode.coneInnerAngle = AUDIO_CONFIG.SPATIAL.CONE_INNER_ANGLE
       this.pannerNode.coneOuterAngle = AUDIO_CONFIG.SPATIAL.CONE_OUTER_ANGLE
       this.pannerNode.coneOuterGain = AUDIO_CONFIG.SPATIAL.CONE_OUTER_GAIN
-      
+
 
       const source = this.audioContext.createBufferSource()
       source.buffer = audioBuffer
-      
+
       // Connect: source -> gainNode -> pannerNode -> destination
       // Also connect source -> analyser for volume analysis
       source.connect(this.gainNode)
-      
+
       if (this.spatialEnabled && this.pannerNode) {
         this.gainNode.connect(this.pannerNode)
         this.pannerNode.connect(this.audioContext.destination)
       } else {
         this.gainNode.connect(this.audioContext.destination)
       }
-      
+
       source.connect(this.analyser)
 
       return source
@@ -66,7 +66,7 @@ export class LipSync {
     if (!this.analyser || !this.dataArray) return 0
 
     this.analyser.getFloatTimeDomainData(this.dataArray)
-    
+
     let volume = 0.0
     for (let i = 0; i < this.dataArray.length; i++) {
       volume = Math.max(volume, Math.abs(this.dataArray[i]))
@@ -88,13 +88,13 @@ export class LipSync {
 
     // Enhanced attenuation: steep near-field decay, gentle far-field decay
     const normalizedDistance = Math.min(distance / MAX_DISTANCE, 1)
-    
+
     // Use exponential decay for steep near-field and gentle far-field response
     // exp(-k*x) where k controls steepness
     const decayFactor = 4 // Higher = steeper near-field decay
     const exponentialDecay = Math.exp(-decayFactor * normalizedDistance)
     const baseVolume = Math.max(MIN_VOLUME, MIN_VOLUME + (MAX_VOLUME - MIN_VOLUME) * exponentialDecay)
-    
+
     // Apply master volume
     const volume = baseVolume * this.masterVolume
 
@@ -114,27 +114,33 @@ export class LipSync {
     const listener = this.audioContext.listener
 
     // Update listener position (head position - camera position + forward offset)
+    // Update listener position (microphone position)
     const forward = new THREE.Vector3(0, 0, -1)
     forward.applyQuaternion(camera.quaternion)
     forward.normalize()
 
-    const listenerPos = camera.position.clone().add(
-      forward.multiplyScalar(AUDIO_CONFIG.SPATIAL.HEAD_OFFSET)
+    const micOffset = new THREE.Vector3(
+      AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.X,
+      AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Y,
+      AUDIO_CONFIG.SPATIAL.MICROPHONE_POSITION.Z
     )
+    micOffset.applyQuaternion(camera.quaternion)
+
+    const listenerPos = camera.position.clone().add(micOffset)
     if (listener.positionX) {
       // Use new API if available
       const currentTime = this.audioContext.currentTime
       const smoothingTime = currentTime + AUDIO_CONFIG.SPATIAL.POSITION_SMOOTHING
-      
+
       listener.positionX.linearRampToValueAtTime(listenerPos.x, smoothingTime)
       listener.positionY.linearRampToValueAtTime(listenerPos.y, smoothingTime)
       listener.positionZ.linearRampToValueAtTime(listenerPos.z, smoothingTime)
-      
+
       // Update listener orientation (where the camera is looking)
       // Reuse the forward vector already calculated above
       const up = new THREE.Vector3(0, 1, 0)
       up.applyQuaternion(camera.quaternion)
-      
+
       listener.forwardX.linearRampToValueAtTime(forward.x, smoothingTime)
       listener.forwardY.linearRampToValueAtTime(forward.y, smoothingTime)
       listener.forwardZ.linearRampToValueAtTime(forward.z, smoothingTime)
@@ -160,7 +166,7 @@ export class LipSync {
       // Use new API if available
       const currentTime = this.audioContext.currentTime
       const smoothingTime = currentTime + AUDIO_CONFIG.SPATIAL.POSITION_SMOOTHING
-      
+
       this.pannerNode.positionX.linearRampToValueAtTime(characterPosition.x, smoothingTime)
       this.pannerNode.positionY.linearRampToValueAtTime(characterPosition.y, smoothingTime)
       this.pannerNode.positionZ.linearRampToValueAtTime(characterPosition.z, smoothingTime)
@@ -176,11 +182,11 @@ export class LipSync {
 
   public setSpatialEnabled(enabled: boolean): void {
     this.spatialEnabled = enabled
-    
+
     // Reconnect audio nodes based on spatial audio setting
     if (this.gainNode && this.pannerNode && this.audioContext) {
       this.gainNode.disconnect()
-      
+
       if (enabled) {
         this.gainNode.connect(this.pannerNode)
         this.pannerNode.connect(this.audioContext.destination)
@@ -192,7 +198,7 @@ export class LipSync {
 
   public setMasterVolume(volume: number): void {
     this.masterVolume = Math.max(0, Math.min(1, volume))
-    
+
     // If spatial audio is not enabled, update volume directly
     if (!this.spatialEnabled && this.gainNode && this.audioContext) {
       const currentTime = this.audioContext.currentTime
