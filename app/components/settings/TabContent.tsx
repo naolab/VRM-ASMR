@@ -80,8 +80,6 @@ export const TabContent: React.FC<TabContentProps> = ({
             <CameraSettings
               followCamera={followCamera}
               onFollowCameraChange={onFollowCameraChange}
-              showMicrophone={showMicrophone}
-              onShowMicrophoneChange={onShowMicrophoneChange}
             />
           </div>
         )
@@ -131,6 +129,8 @@ export const TabContent: React.FC<TabContentProps> = ({
               themes={themes}
               currentTheme={currentTheme}
               onThemeChange={onThemeChange}
+              showMicrophone={showMicrophone}
+              onShowMicrophoneChange={onShowMicrophoneChange}
             />
           </div>
         )

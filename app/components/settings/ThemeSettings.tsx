@@ -1,17 +1,22 @@
 import React from 'react'
 import { Theme, ThemeOption } from '../../types/settings'
 import { Button } from '../ui'
+import { ToggleSwitch } from '../ui/ToggleSwitch'
 
 interface ThemeSettingsProps {
   themes: ThemeOption[]
   currentTheme: Theme
   onThemeChange: (theme: Theme) => void
+  showMicrophone: boolean
+  onShowMicrophoneChange: (value: boolean) => void
 }
 
 export const ThemeSettings: React.FC<ThemeSettingsProps> = ({
   themes,
   currentTheme,
-  onThemeChange
+  onThemeChange,
+  showMicrophone,
+  onShowMicrophoneChange
 }) => {
   return (
     <div style={{ marginBottom: '40px' }}>
@@ -23,7 +28,7 @@ export const ThemeSettings: React.FC<ThemeSettingsProps> = ({
       }}>
         テーマ設定
       </div>
-      
+
       <div style={{
         display: 'flex',
         gap: '16px',
@@ -48,6 +53,23 @@ export const ThemeSettings: React.FC<ThemeSettingsProps> = ({
             <></>
           </Button>
         ))}
+      </div>
+
+      <div style={{ marginTop: '32px' }}>
+        <div style={{
+          fontSize: '22px',
+          fontWeight: 'bold',
+          color: '#333',
+          marginBottom: '20px'
+        }}>
+          表示オプション
+        </div>
+
+        <ToggleSwitch
+          checked={showMicrophone}
+          onChange={onShowMicrophoneChange}
+          label="マイク表示"
+        />
       </div>
     </div>
   )
