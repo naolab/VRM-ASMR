@@ -8,7 +8,7 @@ export const AboutSettings: React.FC = () => {
             </h2>
             <section style={{ marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>ライセンス</h3>
-                <p>このアプリは <a href="/LICENSE" target="_blank" rel="noopener noreferrer">ISC ライセンス</a> の下で配布されています。</p>
+                <p>このアプリは <a href="/license" target="_blank" rel="noopener noreferrer">ISC ライセンス</a> の下で配布されています。</p>
             </section>
             <section style={{ marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>クレジット</h3>
