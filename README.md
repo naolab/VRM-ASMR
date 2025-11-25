@@ -54,6 +54,13 @@ VRM Soundscapeは、没入感のある立体音響体験に焦点を当てたWeb
 
 4. ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
 
+## クレジット
+
+デフォルトVRMモデル（Noa.vrm）は、VRoid Studio のサンプルモデル（AvatarSample_O）の髪型を使用し、その他の部分を改変して作成されたものです。
+
+- ベースモデル: VRoid Studio サンプルモデル (AvatarSample_O)
+- 改変・作成: naolab
+
 ## ライセンス
 
 ISC
