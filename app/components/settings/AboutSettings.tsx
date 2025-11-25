@@ -1,6 +1,7 @@
 import React from 'react';
 
 export const AboutSettings: React.FC = () => {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     return (
         <div style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '20px' }}>
@@ -8,7 +9,7 @@ export const AboutSettings: React.FC = () => {
             </h2>
             <section style={{ marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>ライセンス</h3>
-                <p>このアプリは <a href="/license" target="_blank" rel="noopener noreferrer">ISC ライセンス</a> の下で配布されています。</p>
+                <p>このアプリは <a href={`${basePath}/license`} target="_blank" rel="noopener noreferrer">ISC ライセンス</a> の下で配布されています。</p>
             </section>
             <section style={{ marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>クレジット</h3>
