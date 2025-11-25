@@ -187,14 +187,10 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
         handleCameraUpdate(camera)
 
         // Load VRM with LookAtSmoother plugin
-        const { VRMLookAtSmootherLoaderPlugin } = await import('../lib/VRMLookAtSmoother/VRMLookAtSmootherLoaderPlugin')
-
         if (!mounted) return
 
         const loader = new GLTFLoader()
-        loader.register((parser: any) => new VRMLoaderPlugin(parser, {
-          lookAtPlugin: new VRMLookAtSmootherLoaderPlugin(parser),
-        }))
+        loader.register((parser: any) => new VRMLoaderPlugin(parser))
 
         clock = new THREE.Clock()
 

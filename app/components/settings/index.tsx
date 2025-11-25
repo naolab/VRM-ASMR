@@ -1,5 +1,6 @@
 export { Settings } from './Settings';
-export { SettingsTabs, SettingsTab } from './SettingsTabs';
+export { SettingsTabs } from './SettingsTabs';
+export type { SettingsTab } from './SettingsTabs';
 export { TabContent } from './TabContent';
 export { ThemeSettings } from './ThemeSettings';
 export { CameraSettings } from './CameraSettings';
