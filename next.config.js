@@ -10,6 +10,10 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath
+  },
+  generateBuildId: async () => {
+    // Generate unique build ID to prevent caching issues
+    return `build-${Date.now()}`;
   }
 };
 
