@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'VRM Soundscape',
+  title: 'VRM ASMR',
   description: 'VRM × WebAudio 立体音響デモ',
 }
 

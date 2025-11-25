@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useLocalStorageSettings } from './useLocalStorage'
 
-const VRM_STORAGE_KEY = 'vrm-soundscape-vrm'
+const VRM_STORAGE_KEY = 'vrm-asmr-vrm'
 
 interface VRMSettings {
   followCamera: boolean

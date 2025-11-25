@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { Theme, ThemeOption } from '../types/settings'
 import { AudioFile } from '../types/audio'
 
-const STORAGE_KEY = 'vrm-soundscape-settings'
+const STORAGE_KEY = 'vrm-asmr-settings'
 
 const loadSettings = (): { theme: Theme; followCamera: boolean; spatialAudio: boolean; volume: number; customVRMUrl?: string; audioFiles?: AudioFile[]; selectedAudioId?: string | null } => {
   if (typeof window === 'undefined') return { theme: 'blue', followCamera: false, spatialAudio: true, volume: 0.5, audioFiles: [], selectedAudioId: null }

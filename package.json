@@ -1,5 +1,5 @@
 {
-  "name": "vrm-soundscape",
+  "name": "vrm-asmr",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,16 +14,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/naolab/vrm-soundscape.git"
+    "url": "git+https://github.com/naolab/vrm-asmr.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/naolab/vrm-soundscape/issues"
+    "url": "https://github.com/naolab/vrm-asmr/issues"
   },
-  "homepage": "https://github.com/naolab/vrm-soundscape#readme",
+  "homepage": "https://github.com/naolab/vrm-asmr#readme",
   "dependencies": {
     "@pixiv/three-vrm": "^3.4.2",
     "@pixiv/three-vrm-animation": "^3.4.2",

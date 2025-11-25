@@ -1,6 +1,6 @@
-# VRM Soundscape
+# VRM ASMR
 
-VRM Soundscapeは、没入感のある立体音響体験に焦点を当てたWebベースのVRMビューアーアプリケーションです。
+VRM ASMRは、没入感のある立体音響体験に焦点を当てたWebベースのVRMビューアーアプリケーションです。
 3Dキャラクターが音声に合わせてリップシンクし、リアルなアイコンタクトを行うことで、まるでそこにいるかのような実在感を生み出します。
 
 ## 特徴
@@ -34,8 +34,8 @@ VRM Soundscapeは、没入感のある立体音響体験に焦点を当てたWeb
 
 1. リポジトリをクローンします:
    ```bash
-   git clone https://github.com/naolab/vrm-soundscape.git
-   cd vrm-soundscape
+   git clone https://github.com/naolab/vrm-asmr.git
+   cd vrm-asmr
    ```
 
 2. 依存関係をインストールします:

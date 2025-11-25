@@ -17,7 +17,7 @@ export const AboutSettings: React.FC = () => {
             </section>
             <section>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>リポジトリ</h3>
-                <p>ソースコードは <a href="https://github.com/naolab/vrm-soundscape" target="_blank" rel="noopener noreferrer">GitHub</a> で公開されています。</p>
+                <p>ソースコードは <a href="https://github.com/naolab/vrm-asmr" target="_blank" rel="noopener noreferrer">GitHub</a> で公開されています。</p>
             </section>
         </div>
     );

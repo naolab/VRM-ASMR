@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useLocalStorageSettings } from './useLocalStorage'
 import { AudioFile } from '../types/audio'
 
-const AUDIO_STORAGE_KEY = 'vrm-soundscape-audio'
+const AUDIO_STORAGE_KEY = 'vrm-asmr-audio'
 
 interface AudioSettings {
   spatialAudio: boolean

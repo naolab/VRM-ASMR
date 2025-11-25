@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useLocalStorage } from './useLocalStorage'
 import { Theme, ThemeOption } from '../types/settings'
 
-const THEME_STORAGE_KEY = 'vrm-soundscape-theme'
+const THEME_STORAGE_KEY = 'vrm-asmr-theme'
 
 /**
  * テーマ関連の設定を管理するフック
