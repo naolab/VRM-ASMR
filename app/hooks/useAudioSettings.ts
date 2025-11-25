@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useLocalStorageSettings } from './useLocalStorage'
 import { AudioFile } from '../types/audio'
 
@@ -24,6 +24,13 @@ const defaultAudioSettings: AudioSettings = {
 export const useAudioSettings = () => {
   const [settings, updateSettings] = useLocalStorageSettings(AUDIO_STORAGE_KEY, defaultAudioSettings)
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState<string | null>(null)
+
+  // Clear audio files on mount (blob URLs become invalid after page reload)
+  useEffect(() => {
+    if (settings.audioFiles.length > 0) {
+      updateSettings({ audioFiles: [], selectedAudioId: null })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const changeSpatialAudio = useCallback((spatialAudio: boolean) => {
     updateSettings({ spatialAudio })
