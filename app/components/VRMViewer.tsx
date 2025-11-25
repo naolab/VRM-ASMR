@@ -313,7 +313,37 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
             autoBlink.update(deltaTime)
           }
 
+          // Apply manual tilt towards microphone (Head and Neck) temporarily for rendering
+          const head = vrm?.humanoid?.getNormalizedBoneNode('head')
+          const neck = vrm?.humanoid?.getNormalizedBoneNode('neck')
+          const leftEye = vrm?.humanoid?.getNormalizedBoneNode('leftEye')
+          const rightEye = vrm?.humanoid?.getNormalizedBoneNode('rightEye')
+
+          const originalHeadRot = head?.rotation.clone()
+          const originalNeckRot = neck?.rotation.clone()
+          const originalLeftEyeRot = leftEye?.rotation.clone()
+          const originalRightEyeRot = rightEye?.rotation.clone()
+
+          // Tilt head/neck down towards mic
+          const tiltAmount = 0.15
+          const neckTiltAmount = 0.05
+
+          if (head) head.rotation.x += tiltAmount
+          if (neck) neck.rotation.x += neckTiltAmount
+
+          // Compensate eyes to look back up at camera
+          // (Subtract the total tilt amount from eyes)
+          const totalTilt = tiltAmount + neckTiltAmount
+          if (leftEye) leftEye.rotation.x -= totalTilt
+          if (rightEye) rightEye.rotation.x -= totalTilt
+
           renderer.render(scene, camera)
+
+          // Restore original rotations to prevent accumulation
+          if (head && originalHeadRot) head.rotation.copy(originalHeadRot)
+          if (neck && originalNeckRot) neck.rotation.copy(originalNeckRot)
+          if (leftEye && originalLeftEyeRot) leftEye.rotation.copy(originalLeftEyeRot)
+          if (rightEye && originalRightEyeRot) rightEye.rotation.copy(originalRightEyeRot)
         }
         animate()
 
