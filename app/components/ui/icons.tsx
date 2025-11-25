@@ -8,10 +8,8 @@ interface IconProps {
 // VRM/Character icon
 export const VRMIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 4H9L3 7V9H5V20H19V9H21ZM7 20V8H17V20H7Z"
-      fill={color}
-    />
+    <circle cx="12" cy="6" r="3" fill={color} />
+    <rect x="8" y="10" width="8" height="11" rx="2" fill={color} />
   </svg>
 )
 
