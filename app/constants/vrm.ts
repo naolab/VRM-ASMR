@@ -1,4 +1,6 @@
 // VRM viewer configuration constants
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 export const VRM_CONFIG = {
   CAMERA: {
     FOV: 30.0,
@@ -19,6 +21,6 @@ export const VRM_CONFIG = {
       INTENSITY: Math.PI * 0.2
     }
   },
-  DEFAULT_MODEL_PATH: '/models/Noa.vrm',
+  DEFAULT_MODEL_PATH: `${basePath}/models/Noa.vrm`,
   MOUTH_EXPRESSION_CANDIDATES: ['aa', 'A', 'a', 'mouth_a', 'mouth_aa', 'Aa', 'oh', 'O', 'o']
 } as const

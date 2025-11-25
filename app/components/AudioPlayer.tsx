@@ -62,7 +62,8 @@ export const AudioPlayer = React.memo<AudioPlayerProps>(({
       lipSyncRef.current.setMasterVolume(masterVolume)
 
       // Determine which audio to play
-      let audioUrl = '/audio/test.mp3' // Default audio
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      let audioUrl = `${basePath}/audio/test.mp3` // Default audio
       if (selectedAudioId) {
         const selectedAudio = audioFiles.find(audio => audio.id === selectedAudioId)
         if (selectedAudio) {

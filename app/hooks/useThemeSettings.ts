@@ -19,8 +19,9 @@ export const useThemeSettings = () => {
   ]
 
   const getBackgroundStyle = useCallback((theme: Theme) => {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     return {
-      backgroundImage: `url(/textures/${theme}.png)`,
+      backgroundImage: `url(${basePath}/textures/${theme}.png)`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'

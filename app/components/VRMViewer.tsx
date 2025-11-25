@@ -246,7 +246,8 @@ export const VRMViewer: React.FC<VRMViewerProps> = React.memo(({
 
             // Load idle animation
             try {
-              const idleAnimation = await loadVRMAnimation('/idle_loop.vrma')
+              const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+              const idleAnimation = await loadVRMAnimation(`${basePath}/idle_loop.vrma`)
               if (idleAnimation && mounted) {
                 const clip = idleAnimation.createAnimationClip(vrm)
                 const action = mixer!.clipAction(clip)
